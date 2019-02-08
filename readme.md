@@ -47,3 +47,7 @@ cp .env.example .env
 <!-- SS with medium bookmarks -->
 <!-- cli when running the main commnad -->
 <!-- trello afterwards -->
+
+## TODOS
+
+* [ ] add filter url to a certain category without any filter key
