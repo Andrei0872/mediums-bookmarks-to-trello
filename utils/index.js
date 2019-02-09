@@ -316,7 +316,7 @@ function convertToJSON(obj) {
 // ==========================================================
 
 function showList (list) {
-    list.forEach(({ name }) => log(name))
+    list.map(({ name }) => name).sort().forEach(log)
 }
 
 // ==========================================================
