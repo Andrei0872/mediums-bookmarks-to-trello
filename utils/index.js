@@ -14,7 +14,8 @@ const req_options = {
 
 
 const trello_headers = {
-    cookie: process.env.cookieTrello
+    cookie: process.env.cookieTrello,
+    'Content-Type': 'application/json'
 }
 
 const medium_headers = {
@@ -238,21 +239,22 @@ async function save(arr, trello) {
 // ==========================================================
 
 async function processRequests(requests) {
-    // console.log('processing', requests)
-    const promises = requests.flatMap(([addCard, deleteMediumBookmark], ind) => {
-        return [
-            addCard(),
-            deleteMediumBookmark()
-        ]
-    })
+    let errorFound = false;
 
     try {
-        const solvedPromises = await Promise.all(promises)
-        solvedPromises.forEach(promise => promise !== undefined ?
-            console.log('OK!') :
-            console.log('still testing'))
-    } catch (err) {
-        console.error('error', err)
+        await Promise.all(
+            requests.flatMap(async ([addCard, deleteMediumBookmark]) => {
+                return [
+                    await addCard(),
+                    await deleteMediumBookmark()
+                ]
+            })
+        )
+    } catch {
+        console.log('An error has occurred! Please make sure that your cookies / tokens are up to date');
+        errorFound = true;
+    } finally {
+        errorFound ? null : console.log('Links added successfully')
     }
 }
 
