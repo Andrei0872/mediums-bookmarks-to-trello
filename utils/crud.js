@@ -12,18 +12,17 @@ const getTrelloInfo = (() => {
         return lists;
     };
 })();
-// Use process.env.idBoard...
-// getTrelloInfo.idBoard = '5c40fdb50e3fd52f2e636394';
+
 getTrelloInfo.idBoard = process.env.idBoard;
 
 const addList = (() => {
     const URL = process.env.urlTrelloLists;
     const headers = {
-        cookie: process.env.cookieTrello
+        cookie: process.env.cookieTrello,
+        'Content-Type': 'application/json'
     };
     const body = {
         closed: false,
-        // idBoard: "5c40fdb50e3fd52f2e636394", 
         idBoard: process.env.idBoard,
         name: "",
         pos: 5308415,
