@@ -93,15 +93,9 @@ function results(arr, filters) {
         let ind;
         memo.forEach((item, i) => {
             if (!ok) {
-                if (Array.isArray(item.key)) {
-                    let found = item.key.some(k => k.test(str.toLowerCase()))
-                    if (found)
-                        ok = true, ind = i
-                } else {
-                    // FIXME: maybe there's no need for this else block
-                    if (str.toLowerCase().includes(item.key))
-                        ok = true, ind = i
-                }
+                let found = item.key.some(k => k.test(str.toLowerCase()))
+                if (found)
+                    ok = true, ind = i
             }
         })
         if (ok && !memo[ind].items.has(curr))
@@ -217,8 +211,6 @@ async function save(arr, trello) {
         })
     }
 
-    // const stdin = process.openStdin();
-
     process.stdout.write('All good? (y/n)');
 
     stdin.addListener('data', text => {
@@ -286,6 +278,7 @@ async function addFilterKey([nameToFind, newKey], bigObj, trello) {
         process.exit(1)
     }
 
+    // If the `create!field <field_key>` command has been executed
     if (index_field === -1) {
         bigObj !== false 
             && bigObj.filters.push({

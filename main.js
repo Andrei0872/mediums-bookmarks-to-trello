@@ -20,8 +20,6 @@
     let bigObj,
         trello;
 
-    // ==========================================================
-
 
     const goodToGo = await new Promise((resolve, reject) => {
         fs.access('./trello.json', async (err, _) => {
@@ -51,45 +49,23 @@
             resolve('OK');
         });
     });
-
-    // fs.access('./config.json', (err, _) => {
-    //     if (err) {
-    //         const filters = require('./config')
-
-    //         bigObj = {
-    //             trello,
-    //             filters: filters.map(convertToJSON)
-    //         };
-
-    //         fs.writeFile('./config.json', JSON.stringify(bigObj), 'utf8', (err, data) => {
-    //             if (err) {
-    //                 console.log(err)
-    //                 // process.exit(1)
-    //             }
-    //         }) 
-    //     }
-    //     // File already exists
-    //     bigObj = fs.readFileSync('./config.json', 'utf8');
-    //     bigObj = JSON.parse(bigObj)
-    //     bigObj.filters = bigObj.filters.map(parseJSON)
-    // })
     
-        fs.access('./config.json', (err, _) => {
-            if (err) {
-                const filters = require('./config')
+    fs.access('./config.json', (err, _) => {
+        if (err) {
+            const filters = require('./config')
 
-                bigObj = {
-                    trello,
-                    filters: filters.map(convertToJSON)
-                };
+            bigObj = {
+                trello,
+                filters: filters.map(convertToJSON)
+            };
 
-                fs.writeFileSync('./config.json', JSON.stringify(bigObj));
-            }
-            // File already exists
-            bigObj = fs.readFileSync('./config.json', 'utf8');
-            bigObj = JSON.parse(bigObj)
-            bigObj.filters = bigObj.filters.map(parseJSON)
-        })
+            fs.writeFileSync('./config.json', JSON.stringify(bigObj));
+        }
+        // File already exists
+        bigObj = fs.readFileSync('./config.json', 'utf8');
+        bigObj = JSON.parse(bigObj)
+        bigObj.filters = bigObj.filters.map(parseJSON)
+    })
 
     // ==========================================================
 
@@ -112,7 +88,6 @@
     if ([...yet_not_filtered].length) {
 
         log('Need to add filters!!!!!')
-        // console.log(filtered_again)
         const arrayFromSet = [...yet_not_filtered];
 
         arrayFromSet[Symbol.asyncIterator] = async function* () {
@@ -151,10 +126,6 @@
             await addFilterKey(item, bigObj, trello)
         }
 
-        // Sync is needed as the cb of an async reading will be called in the next iteration 
-        // If writing async is really needed, you could wrap it into a promise, because promises
-        // are executed before the end of the current iteration of the event loop
-        // console.log(trello)
         updateJSON(bigObj, './config.json');
         updateJSON(trello, './trello.json', false);
         log("updated!")
