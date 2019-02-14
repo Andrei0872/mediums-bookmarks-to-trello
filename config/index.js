@@ -39,7 +39,7 @@ const filters = [
     filter_info('rails', ['rails']),
     filter_info('reactNative', ['react native']),
     filter_info('redux', ['redux']),
-    filter_info('react', ['react', 'react native', 'hooks', 'props']),
+    filter_info('react', ['react','hooks', 'props']),
     filter_info('node', ['node.js', 'es modules', 'nodejs']),
     filter_info('frontEnd', ['front end', 'frontend']),
     filter_info('backEnd', ['backend', 'back end']),
