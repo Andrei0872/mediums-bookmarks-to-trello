@@ -164,7 +164,7 @@ function addCard(trello_info, link) {
 
 // ==========================================================
 
-async function save(arr, trello) {
+async function save(arr, { trello }) {
     const stdin = process.openStdin();
     let r = arr.reduce((memo, curr) => {
         if ([...curr.items].length) {
@@ -254,7 +254,8 @@ async function processRequests(requests) {
 /* 
 @if bigObj === false - add list to trello on the fly
 */
-async function addFilterKey([nameToFind, newKey], bigObj, trello) {
+async function addFilterKey([nameToFind, newKey], bigObj) {
+    const { trello } = bigObj;
     let index_field = -1,
         newField;
     
@@ -270,7 +271,10 @@ async function addFilterKey([nameToFind, newKey], bigObj, trello) {
     if (index_field === -1 && mustCreateIndex === -1) {
         console.log(`${nameToFind} cannot be found.`)
         const suggestions = bigObj.filters.filter(({ name }) => {
-            return name.includes(nameToFind) || nameToFind.includes(name)
+            return name.includes(nameToFind) 
+                || nameToFind.includes(name)
+                || nameToFind.includes('_') 
+                    &&  nameToFind.split('_').some(item => name.includes(item))
         })
         .map(filter => filter.name)
 
@@ -353,6 +357,17 @@ function fetchTrelloInfo () {
 }
 
 // ==========================================================
+
+function readFile(file) {
+    return new Promise ((resolve, reject) => {
+        fs.access(file, (err, _) => {
+            if (err) reject();
+            resolve();
+        });
+    })
+}
+
+// ==========================================================
 module.exports = {
     parseJSON,
     createRegex,
@@ -369,4 +384,5 @@ module.exports = {
     updateJSON,
     fetchTrelloInfo,
     showList,
+    readFile,
 }
