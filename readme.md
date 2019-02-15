@@ -35,6 +35,7 @@
         Getting the idBoard & token & cookie
     </summary>
     <ul>
+        <li>Create a new card</li>
         <li>Open the dev tools and open the Network tab</li>
         <li>Clear the Network tab.</li>
         <li>Create a new list(doesn't matter the name)</li>
