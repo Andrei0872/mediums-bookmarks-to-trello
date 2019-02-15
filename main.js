@@ -16,56 +16,44 @@
         updateJSON,
         location_info,
         showList,
+        readFile,
     } = require('./utils');
-    let bigObj,
-        trello;
-
-
-    const goodToGo = await new Promise((resolve, reject) => {
-        fs.access('./trello.json', async (err, _) => {
-            if (err) {
-                console.log('generating lists..');
-                const listsArr = require('./config');
-                // await generateLists(listsArr, '5c57ece4c3bca92675ef4c91');
-                await generateLists(listsArr, process.env.idBoard);
-
-                console.log('lists generated. now adding fields to json file..')
-
-                const tempTrelloObj = {};
-                (await getTrelloInfo())
-                .forEach(({
-                    name,
-                    id
-                }) => {
-                    tempTrelloObj[`${name}`] = location_info(id, process.env.idBoard);
-                });
-
-                updateJSON(tempTrelloObj, './trello.json', false);
-                resolve('OK!');
-            }
-
-            trello = fs.readFileSync('./trello.json', 'utf8');
-            trello = JSON.parse(trello)
-            resolve('OK');
-        });
-    });
+    let bigObj;
     
-    fs.access('./config.json', (err, _) => {
-        if (err) {
-            const filters = require('./config')
+    
+    try {
+        await readFile('./config.json');
+    } catch {
 
-            bigObj = {
-                trello,
-                filters: filters.map(convertToJSON)
-            };
+        console.log('generating lists..');
+        const filters = require('./config')
+        await generateLists(filters, process.env.idBoard);
 
-            fs.writeFileSync('./config.json', JSON.stringify(bigObj));
-        }
+        console.log('lists generated. now adding fields to json file..')
+
+        const tempTrelloObj = {};
+        (await getTrelloInfo())
+        .forEach(({
+            name,
+            id
+        }) => {
+            tempTrelloObj[`${name}`] = location_info(id, process.env.idBoard);
+        });
+
+
+        bigObj = {
+            trello: tempTrelloObj,
+            filters: filters.map(convertToJSON)
+        };
+
+        fs.writeFileSync('./config.json', JSON.stringify(bigObj));
+    } finally {
+
         // File already exists
         bigObj = fs.readFileSync('./config.json', 'utf8');
         bigObj = JSON.parse(bigObj)
         bigObj.filters = bigObj.filters.map(parseJSON)
-    })
+    }
 
     // ==========================================================
 
@@ -123,18 +111,18 @@
 
         for await (const item of arrayFromSet) {
             console.log(item)
-            await addFilterKey(item, bigObj, trello)
+            await addFilterKey(item, bigObj)
         }
 
         updateJSON(bigObj, './config.json');
-        updateJSON(trello, './trello.json', false);
+        // updateJSON(trello, './trello.json', false);
         log("updated!")
 
         process.stdout.write('\ndone!\n')
         process.exit(0)
     }
 
-    save(filtered_again, trello)
+    save(filtered_again, bigObj)
     log('\n==============================================\n');
 })()
 
