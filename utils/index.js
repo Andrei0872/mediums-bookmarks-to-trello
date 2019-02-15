@@ -164,7 +164,8 @@ function addCard(trello_info, link) {
 
 // ==========================================================
 
-async function save(arr, { trello }) {
+async function save(arr, bigObj) {
+    const { trello } = bigObj; 
     const stdin = process.openStdin();
     let r = arr.reduce((memo, curr) => {
         if ([...curr.items].length) {
@@ -174,10 +175,13 @@ async function save(arr, { trello }) {
         }
         return memo
     }, {});
+    let needsUpdate = false;
 
     const allRequests = []
     for (let prop of Object.keys(r)) {
         if (!trello[prop]) {
+            needsUpdate = true;
+
             console.log('still missing in trello', [...r[prop][0], prop])
             log('');
             process.stdout.write(`do you want to create the '${prop}' list now ? (y/n)`)
@@ -188,7 +192,7 @@ async function save(arr, { trello }) {
                     const answer = data.toString().toLowerCase().trim()
     
                     if (answer === 'y') {
-                        await addFilterKey([`create!${prop}`, []], false, trello);
+                        await addFilterKey([`create!${prop}`, []], bigObj, true);
                     } else {
                         console.log('you must create the list before proceeding!')
                         process.exit(1);
@@ -207,9 +211,10 @@ async function save(arr, { trello }) {
                 addCard(trello[prop], data.url),
                 deleteBookmark(data.id)
             ]);
-            updateJSON(trello, './trello.json', false);
         })
     }
+    // Update after some changes have been made(adding keywords | creating new lists)
+    needsUpdate && updateJSON(bigObj, './config.json');
 
     process.stdout.write('All good? (y/n)');
 
@@ -254,8 +259,9 @@ async function processRequests(requests) {
 /* 
 @if bigObj === false - add list to trello on the fly
 */
-async function addFilterKey([nameToFind, newKey], bigObj) {
+async function addFilterKey([nameToFind, newKey], bigObj, onlyCreateList = false) {
     const { trello } = bigObj;
+
     let index_field = -1,
         newField;
     
@@ -284,7 +290,7 @@ async function addFilterKey([nameToFind, newKey], bigObj) {
 
     // If the `create!field <field_key>` command has been executed
     if (index_field === -1) {
-        bigObj !== false 
+        onlyCreateList === false
             && bigObj.filters.push({
                 name: newField,
                 key: newKey,
