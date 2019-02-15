@@ -96,8 +96,3 @@ Getting the cookie & token
 <!-- cli when running the main commnad -->
 <!-- trello afterwards -->
 <!-- all or nothing -->
-
-## TODOS
-
-* [ ] add filter url to a certain category without any filter key
-* [ ] keep article in saved bookmarks (thus will not be added to trello)
