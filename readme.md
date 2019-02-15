@@ -1,34 +1,58 @@
 
 <!-- ### There is also an article about this.  -->
 
-<!-- https://gist.github.com/joyrexus/16041f2426450e73f5df9391f7f7ae5f -->
+# Moving your Medium Bookmarks to Trello
+I firmly believe that our time should be spent on important things. <br>
+*The time you spent searching for an article could be time spent on reading that article.*
 
-<!-- urlTrello: ...?lists=open -->
+---
+
+## Demo
+Insert gif here
+
+---
 
 ## Getting started
 
 * ```cp .env.example .env```
 
 * ```npm i```
+
 * [Setting up Trello](#setting-up-trello)
 
 * [Setting up Medium](#setting-up-medium)
 
+---
 
 ## Features
-<!-- log file -->
-<!-- add new filter key -->
-<!-- add new filter and filter key -->
-<!-- add item to trello -->
+
+*conventions*: field = list name; keyword = filter key
+
+* fetch saved posts from Medium and transfer them to Trello and also remove them from bookmark list
+* the keywords for a field can also include regular expressions
+* <details>
+    <summary>add keyword to a field</summary>
+    <div>
+        Syntax: <code> $field_name $filter_key1 | $filter_key2</code>
+        <br>
+        Example: react react hooks | \bstyled components\b
+    </div>
+    </details> 
+* <details>
+    <summary>create field and add keywords to it</summary>
+    <div>
+        Syntax: <code> create!$field_name $filter_key1 | $filter_key2</code>
+        <br>
+        Example: create!posts development posts
+    </div>
+    </details> 
+* You can see where each card will be placed by having a look at **info.log** file after getting the message **All good? (y/n)**
+* the `show_list` command will print the existing lists name into the **info.log** file
+* create a Trello list if the list name exists in **config.json**, but not in Trello
 
 ---
 
 ## Setting up Trello
-
-<!-- Getting idBoard -->
-<!-- Create trello board -->
-<!-- Network tab + refresh -->
-<!-- Get id -->
 
 <details>
     <summary>
@@ -47,15 +71,6 @@
         <li>Select the <i>cookie</i>(located in the Request Headers) and paste it in the <i>.env</i> file next to <i>cookieTrello</i></li>
     </ul>
 </details>
-<!-- Getting trello token && cookie -->
-<!-- Clear Network tab -->
-<!-- Create new dummy list -->
-<!-- Click on the request -->
-<!-- Headers -> req payload -> token -->
-<!-- Getting the cookie -->
-<!-- Headers -> cookie -->
-<!-- Getting the urlTrello -->
-<!-- Copy the current URL -->
 
 <details>
     <summary>
