@@ -5,8 +5,6 @@
 I firmly believe that our time should be spent on important things. <br>
 *The time you spent searching for an article could be time spent on reading that article.*
 
----
-
 ## Demo
 Insert gif here
 
