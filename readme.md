@@ -47,6 +47,7 @@ Insert gif here
 * You can see where each card will be placed by having a look at **info.log** file after getting the message **All good? (y/n)**
 * the `show_list` command will print the existing lists name into the **info.log** file
 * create a Trello list if the list name exists in **config.json**, but not in Trello
+* add link to a list(doesn't necessarily have to exist) without applying any filters. [Read more](https://github.com/Andrei0872/medium-bookmarks-to-trello/pull/2)
 
 ---
 
