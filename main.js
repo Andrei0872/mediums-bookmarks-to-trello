@@ -17,8 +17,10 @@
         location_info,
         showList,
         readFile,
+        isEmptyObject,
     } = require('./utils');
-    let bigObj;
+    let bigObj,
+        storeTemp = {};
     
     
     try {
@@ -55,6 +57,12 @@
         bigObj.filters = bigObj.filters.map(parseJSON)
     }
 
+    try {
+        await readFile('./temp.json');
+        storeTemp = fs.readFileSync('./temp.json', 'utf8') || {};
+        storeTemp = JSON.parse(storeTemp);
+    } catch {}
+
     // ==========================================================
 
     /* 
@@ -73,7 +81,7 @@
         unfiltered: yet_not_filtered
     } = results(filteredLinks, bigObj.filters)
 
-    if ([...yet_not_filtered].length) {
+    if ([...yet_not_filtered].length && isEmptyObject(storeTemp)) {
 
         log('Need to add filters!!!!!')
         const arrayFromSet = [...yet_not_filtered];
@@ -84,9 +92,9 @@
             process.stdout.write('\n\n\n');
             process.stdout.write("type 'show_list' and have a look at info.log to see the available list names");
             process.stdout.write('add filter key to an existing field: <field> <filter_key1> | <filter_key2>... \n')
-            process.stdout.write('create field and add fields: create!<field_name> <filter_key1> | <filter_key2>');
+            process.stdout.write('create field and add fields: create!<field_name> <filter_key1> | <filter_key2>\n');
 
-            for (const [key, val] of Object.entries(this)) {
+            for (const val of Object.values(this)) {
                 const res = await new Promise((resolve, reject) => {
                     console.log('current item:', val)
 
@@ -96,35 +104,57 @@
                         if (data === 'show_list') {
                             showList(bigObj.filters);
                         } else {
-                            const spaceIndex = data.indexOf(' ');
-                            const field = data.substr(0, spaceIndex);
-                            const key = data.substr(spaceIndex + 1)
-                                .split('|')
-                                .map(key => createRegex(key.replace(/(^\s+)|(\s+$)/g, '')))
-
-                            resolve([field, key]);
+                            return resolve([data, val]);
                         }
+                        
                     });
                 })
-
                 yield res;
             }
         }
 
-        for await (const item of arrayFromSet) {
-            console.log(item)
-            await addFilterKey(item, bigObj)
+        for await (const [item, val] of arrayFromSet) {
+            if (item.startsWith('temp')) {
+                /**
+                * Add link to temp_field without specifying any keywords.
+                * This is rather useful when you can't use any keywords for a specific link, 
+                * but you still want to add it to a certain list.
+                * TODO: add link!
+                * See {@link http://github...}
+                * @type {String}
+                */
+                let temp_field = /temp\!(\w+)/.exec(item)[1];
+
+                console.log('field', temp_field)
+
+                const existingUrls = storeTemp[temp_field] || []
+                existingUrls.push(val)
+
+                storeTemp[temp_field] = existingUrls;
+            } else {
+                const spaceIndex = item.indexOf(' ');
+                const field = item.substr(0, spaceIndex);
+                const key = item.substr(spaceIndex + 1)
+                    .split('|')
+                    .map(key => createRegex(key.replace(/(^\s+)|(\s+$)/g, '')))
+
+                addFilterKey([field, key], bigObj);
+            }
         }
 
         updateJSON(bigObj, './config.json');
-        // updateJSON(trello, './trello.json', false);
+        updateJSON(storeTemp, './temp.json', false);
         log("updated!")
 
         process.stdout.write('\ndone!\n')
         process.exit(0)
     }
+    
+    for (const key of Object.keys(storeTemp)) {
+        storeTemp[key] = [new Set(storeTemp[key])];
+    }
 
-    save(filtered_again, bigObj)
+    save(filtered_again, bigObj, storeTemp)
     log('\n==============================================\n');
 })()
 
