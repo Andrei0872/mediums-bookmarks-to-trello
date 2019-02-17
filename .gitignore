@@ -5,3 +5,5 @@ you-never-know.txt
 config.json
 trello.json
 .env
+.vscode
+temp.json
