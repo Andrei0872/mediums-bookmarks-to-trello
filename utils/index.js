@@ -163,41 +163,39 @@ function addCard(trello_info, link) {
      }
  }
 
+
+// ==========================================================
+
+function beautifySetOutput (set) {
+    let result = ``;
+    [...set.values()].forEach(({ url }) => result += `${url}\n`);
+
+    return result;
+}
+
 // ==========================================================
 
 async function save(arr, bigObj, storeTemp) {
     const { trello } = bigObj; 
     const stdin = process.openStdin();
-    let r = arr.reduce((memo, curr) => {
-        if ([...curr.items].length) {
-            let temp = memo[curr.name] || [];
-            temp.push(curr.items)
-            memo[curr.name] = temp
-        }
-        return memo
-    }, {});
     let needsUpdate = false;
 
-    /**
-     * Merge the links that need to be filtered
-     * with those that don't
-     * 
-     * TODO: add link here!
-     * {@link https://TBA}
-     */
-    for (const [key, val] of Object.entries(storeTemp)) {
-        const setContent = r[key] && r[key][0] || new Set();
-        [...val.values()].forEach(setContent.add.bind(setContent));
-        
-        !r[key] && ( r[key] = [], r[key][0] = setContent );
-    }
+    const listsAndTheirCards = arr.reduce((memo, curr) => {
+        if (curr.items.size) {
+            const existingItems = memo[curr.name] || new Set();
+            [... curr.items.values()].forEach(existingItems.add.bind(existingItems));
+            
+            memo[curr.name] = existingItems;
+        } 
+        return memo
+    }, { ...storeTemp })
 
     const allRequests = []
-    for (let prop of Object.keys(r)) {
+    for (let prop of Object.keys(listsAndTheirCards)) {
         if (!trello[prop]) {
             needsUpdate = true;
 
-            console.log('still missing in trello', [...r[prop][0], prop])
+            console.log(`the list ${prop} is missing in Trello. This list consists of:\n ${beautifySetOutput(listsAndTheirCards[prop])}\n`)
             log('');
             process.stdout.write(`do you want to create the '${prop}' list now ? (y/n)`)
 
@@ -220,7 +218,7 @@ async function save(arr, bigObj, storeTemp) {
 
         // If the prop did not existed, this will execute after the user has accepted to create the list
         log(`\t ${prop.toUpperCase()}\n`);
-        [...r[prop][0]].flatMap(data => {
+        [...listsAndTheirCards[prop].values()].flatMap(data => {
             log(`Adding ${data.url} to ${prop} - ${new Date().toLocaleDateString()} \n`);
             allRequests.push([
                 addCard(trello[prop], data.url),
@@ -228,6 +226,7 @@ async function save(arr, bigObj, storeTemp) {
             ]);
         })
     }
+
     // Update after some changes have been made(adding keywords | creating new lists)
     needsUpdate && updateJSON(bigObj, './config.json');
 
@@ -245,7 +244,6 @@ async function save(arr, bigObj, storeTemp) {
 
         stdin.pause();
     })
-
 }
 
 // ==========================================================
