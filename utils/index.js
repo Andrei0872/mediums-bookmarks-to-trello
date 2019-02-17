@@ -176,9 +176,15 @@ async function save(arr, bigObj, storeTemp) {
         return memo
     }, {});
     let needsUpdate = false;
+    
+    for (const [key, val] of Object.entries(storeTemp)) {
+        const setContent = r[key] && r[key][0] || new Set();
+        [...val.values()].forEach(setContent.add.bind(setContent));
+        
+        !r[key] && ( r[key] = [], r[key][0] = setContent );
+    }
+
     console.log(r)
-    console.log(storeTemp)
-    return;
     const allRequests = []
     for (let prop of Object.keys(r)) {
         if (!trello[prop]) {
