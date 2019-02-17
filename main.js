@@ -151,7 +151,7 @@
     }
     
     for (const key of Object.keys(storeTemp)) {
-        storeTemp[key] = [new Set(storeTemp[key])];
+        storeTemp[key] = new Set(storeTemp[key]);
     }
 
     save(filtered_again, bigObj, storeTemp)
