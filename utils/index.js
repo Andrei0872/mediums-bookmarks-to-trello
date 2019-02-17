@@ -164,7 +164,7 @@ function addCard(trello_info, link) {
 
 // ==========================================================
 
-async function save(arr, bigObj) {
+async function save(arr, bigObj, storeTemp) {
     const { trello } = bigObj; 
     const stdin = process.openStdin();
     let r = arr.reduce((memo, curr) => {
@@ -176,7 +176,9 @@ async function save(arr, bigObj) {
         return memo
     }, {});
     let needsUpdate = false;
-
+    console.log(r)
+    console.log(storeTemp)
+    return;
     const allRequests = []
     for (let prop of Object.keys(r)) {
         if (!trello[prop]) {
@@ -374,6 +376,17 @@ function readFile(file) {
 }
 
 // ==========================================================
+
+function isEmptyObject (obj) {
+    return JSON.stringify(obj) === JSON.stringify({});
+}
+
+// ==========================================================
+
+function clearFileContent (file) {
+    fs.writeFile(file, '');
+} 
+
 module.exports = {
     parseJSON,
     createRegex,
@@ -391,4 +404,5 @@ module.exports = {
     fetchTrelloInfo,
     showList,
     readFile,
+    isEmptyObject,
 }
