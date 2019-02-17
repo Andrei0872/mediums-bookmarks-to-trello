@@ -1,5 +1,6 @@
 const fetch = require('node-fetch')
-const fs = require('fs')
+const fs = require('fs');
+const path = require('path');
 const log = require('../log')
 const { addList } = require('./crud');
 
@@ -176,7 +177,7 @@ async function save(arr, bigObj, storeTemp) {
         return memo
     }, {});
     let needsUpdate = false;
-    
+
     for (const [key, val] of Object.entries(storeTemp)) {
         const setContent = r[key] && r[key][0] || new Set();
         [...val.values()].forEach(setContent.add.bind(setContent));
@@ -184,7 +185,6 @@ async function save(arr, bigObj, storeTemp) {
         !r[key] && ( r[key] = [], r[key][0] = setContent );
     }
 
-    console.log(r)
     const allRequests = []
     for (let prop of Object.keys(r)) {
         if (!trello[prop]) {
@@ -259,7 +259,8 @@ async function processRequests(requests) {
         console.log('An error has occurred! Please make sure that your cookies / tokens are up to date');
         errorFound = true;
     } finally {
-        errorFound ? null : console.log('Links added successfully')
+        errorFound ? null : console.log('Links added successfully');
+        clearFileContent(path.resolve(__dirname, '..', 'temp.json'));
     }
 }
 
@@ -390,7 +391,7 @@ function isEmptyObject (obj) {
 // ==========================================================
 
 function clearFileContent (file) {
-    fs.writeFile(file, '');
+    fs.writeFile(file, '', (err, _) => {});
 } 
 
 module.exports = {
