@@ -95,16 +95,6 @@ Getting the cookie & token
 * Copy the <i>cookie</i> located in the Request Headers and paste it in the <i>.env</i> file
 * Coy the <i>x-xsrf-token</i> located in the Request Headers and paste it in the <i>.env</i> file
 
-<!-- cookie and token -->
-<!-- Go to bookmarks -->
-<!-- Ofc, you need to have some bookmarks -->
-<!-- Network tab + Refresh -->
-<!-- Scroll until bookmarks req is made -->
-<!-- Click the request -->
-<!-- Req headers -> cookie -->
-<!-- Req headers -> token -->
-
-
 ## Examples
 <!-- SS with medium bookmarks -->
 <!-- cli when running the main commnad -->
