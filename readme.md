@@ -33,7 +33,7 @@ Insert gif here
     <div>
         Syntax: <code> $field_name $filter_key1 | $filter_key2</code>
         <br>
-        Example: react react hooks | \bstyled components\b
+        Example: <code>react react hooks | \bstyled components\b</code>
     </div>
     </details> 
 * <details>
@@ -41,13 +41,20 @@ Insert gif here
     <div>
         Syntax: <code> create!$field_name $filter_key1 | $filter_key2</code>
         <br>
-        Example: create!posts development posts
+        Example: <code> create!posts development posts </code>
     </div>
     </details> 
 * You can see where each card will be placed by having a look at **info.log** file after getting the message **All good? (y/n)**
 * the `show_list` command will print the existing lists name into the **info.log** file
 * create a Trello list if the list name exists in **config.json**, but not in Trello
-* add link to a list(doesn't necessarily have to exist) without applying any filters. [Read more](https://github.com/Andrei0872/medium-bookmarks-to-trello/pull/2)
+* <details>
+    <summary>add link to a list(which doesn't have to exist) without applying any filters. <a href="https://github.com/Andrei0872/medium-bookmarks-to-trello/pull/2">Read More</a></summary>
+    <p>
+        Syntax: <code> temp!$list_name </code>
+        <br>
+        Example: <code> temp!react </code>
+    </p>
+  </details>
 
 ---
 
