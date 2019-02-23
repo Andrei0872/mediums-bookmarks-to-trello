@@ -56,7 +56,7 @@ I firmly believe that our time should be spent on important things. <br>
     </div>
     </details> 
 * You can see where each card will be placed by having a look at **info.log** file after getting the message **All good? (y/n)**
-* the `show_list` command will print the existing lists name into the **info.log** file
+* the `show_list` command will print the existing lists to the **info.log** file
 * create a Trello list if the list name exists in **config.json**, but not in Trello
 * <details>
     <summary>add link to a list(which doesn't have to exist) without applying any filters. <a href="https://github.com/Andrei0872/medium-bookmarks-to-trello/pull/2">Read More</a></summary>
