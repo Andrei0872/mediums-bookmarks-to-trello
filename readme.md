@@ -1,7 +1,7 @@
 
 <!-- ### There is also an article about this.  -->
 
-# Moving your Medium Bookmarks to Trello
+# Moving your Medium's Bookmarks to Trello
 I firmly believe that our time should be spent on important things. <br>
 *The time you spent searching for an article could be time spent on reading that article.*
 
