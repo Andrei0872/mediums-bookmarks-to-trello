@@ -119,8 +119,7 @@
                 * Add link to temp_field without specifying any keywords.
                 * This is rather useful when you can't use any keywords for a specific link, 
                 * but you still want to add it to a certain list.
-                * TODO: add link!
-                * See {@link http://github...}
+                * {@link https://github.com/Andrei0872/medium-bookmarks-to-trello/pull/2}
                 * @type {String}
                 */
                 let temp_field = /temp\!(\w+)/.exec(item)[1];
