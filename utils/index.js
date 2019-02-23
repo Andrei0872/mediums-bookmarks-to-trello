@@ -4,6 +4,7 @@ const path = require('path');
 const log = require('../log')
 const { addList } = require('./crud');
 
+// Needed when you want to add a new card to Trello 
 const req_options = {
     token: process.env.tokenTrello,
     pos: 65535,
@@ -12,7 +13,6 @@ const req_options = {
     idMembers: [],
     dateLastActivity: 1547258041135
 }
-
 
 const trello_headers = {
     cookie: process.env.cookieTrello,
@@ -24,6 +24,16 @@ const medium_headers = {
     'X-XSRF-TOKEN': process.env.tokenMedium,
 }
 
+/**
+ * When reading from `config.json`, each object from the `filters` array
+ * will have the keywords from the `key` field converted to regular expressions
+ * 
+ * @example
+ * {"name":"nuxt","key":"[\"/nuxt/\",\"/nuxt.js/\"]","items":{}}
+ * returns { name: 'nuxt', key: [/nuxt/, /nuxt.js/] items: Set {} }
+ * 
+ * @param {Object} obj - the config Object (bigObj)
+ */
 function parseJSON(obj) {
     return {
         ...obj,
@@ -34,6 +44,13 @@ function parseJSON(obj) {
 
 // ==========================================================
 
+/**
+ * Update a specific JSON file
+ * 
+ * @param {Object} obj 
+ * @param {String} file 
+ * @param {Boolean} needsMap - used when the callee is bigObject 
+ */
 function updateJSON(obj, file, needsMap = true) {
     needsMap && (obj.filters = obj.filters.map(convertToJSON))
     fs.writeFileSync(file, JSON.stringify(obj))
@@ -41,16 +58,28 @@ function updateJSON(obj, file, needsMap = true) {
 
 // ==========================================================
 
+/**
+ * Create a regular expression from a key
+ * 
+ * @param {String} key 
+ */
 function createRegex(key) {
     return new RegExp(`${key}`)
 }
 
 // ==========================================================
 
-function filter_info(name, key, boundary = null) {
+/**
+ * Create a new object, given the `field` and its `keywords`
+ * 
+ * @see {@link https://github.com/Andrei0872/medium-bookmarks-to-trello/blob/master/config/index.js}
+ * 
+ * @param {String} name - The field name
+ * @param {Array} key - The keywords for the field name
+ */
+function filter_info(name, key) {
     return {
         name,
-        // key: key.map(k => new RegExp(`${k}`)),
         key: key.map(createRegex),
         items: new Set()
     }
@@ -58,6 +87,16 @@ function filter_info(name, key, boundary = null) {
 
 // ==========================================================
 
+/**
+ * Create an object that will be added in the config object (bigObj)
+ * It will be used to determine whether or not a list can be found in Trello
+ * 
+ * @example
+ * trello['angular'] = location_info(angularListId, trelloBoardId)
+ * 
+ * @param {String} idList 
+ * @param {String} id_board 
+ */
 function location_info(idList, id_board) {
     return {
         id_board,
@@ -67,6 +106,20 @@ function location_info(idList, id_board) {
 
 // ==========================================================
 
+/**
+ * Separate the `Medium id` from the whole link
+ * Used when we want do remove a certain link from bookmarks(that's why we need the id)
+ * 
+ * @example
+ * item = 'https://medium.freecodecamp.org/the-complete-guide-to-es10-features-5fd0feb9513a?source=bookmarks---------11---------------------'
+ * returns
+ * {
+ *  id: '5fd0feb9513a',
+ *  url: item
+ * }
+ * 
+ * @param {Array} arr 
+ */
 function filterResults(arr) {
     return arr.map(item => {
         const arr = item.split('?')[0].split(/-([A-Za-z0-9]+)?/)
@@ -81,9 +134,16 @@ function filterResults(arr) {
 
 // ==========================================================
 
+/**
+ * This filters the given links depending on bigObj.filters
+ * 
+ * @param {Array} arr - Array of { id: mediumId, url: mediumURl }
+ * @param {Array} filters - The filters from bigObj.filters
+ */
 function results(arr, filters) {
     const unfiltered = new Set();
     let cnt = 0;
+
     let filtered = arr.reduce((memo, curr) => {
         let last_backslash = curr.url.lastIndexOf('/');
         let question_mark = curr.url.lastIndexOf('?')
@@ -114,7 +174,14 @@ function results(arr, filters) {
 
 // ==========================================================
 
-// Add card to trello
+/**
+ * Add card to trello
+ * 
+ * @param {Object} trello_info - @see location_info()
+ * @param {String} link - the name of card(which will essentially be a link)
+ * 
+ * @returns {Function} - The actual Promise will be executed in @see processRequests()
+ */
 function addCard(trello_info, link) {
     return function () {
         return new Promise(async (resolve, reject) => {
@@ -142,30 +209,41 @@ function addCard(trello_info, link) {
 
 // ==========================================================
 
- // Delete bookmark from Medium
- function deleteBookmark(id) {
-     return function () {
-         return new Promise(async (resolve, reject) => {
-             try {
-                 const resp = await fetch(`https://medium.com/p/${id}/bookmarks`, {
-                     headers: medium_headers, // Cookies and CSRF token
-                     method: "DELETE",
-                 })
+/**
+ * Delete bookmark from Medium
+ * 
+ * @param {String} id 
+ * 
+ * @returns {Function} - The actual Promise will be executed in @see processRequests()
+ */
+function deleteBookmark(id) {
+    return function () {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const resp = await fetch(`https://medium.com/p/${id}/bookmarks`, {
+                    headers: medium_headers, // Cookies and CSRF token
+                    method: "DELETE",
+                })
 
-                 if (!resp.ok)
-                     throw resp
+                if (!resp.ok)
+                    throw resp
 
-                 resolve((await resp.text()))
-             } catch (err) {
-                 reject((await err.text()))
-             }
-         });
-     }
- }
+                resolve((await resp.text()))
+            } catch (err) {
+                reject((await err.text()))
+            }
+        });
+    }
+}
 
 
 // ==========================================================
 
+/**
+ * Print to the console the links that are in a list which can't be found in Trello
+ * 
+ * @param {Set} set 
+ */
 function beautifySetOutput (set) {
     let result = ``;
     [...set.values()].forEach(({ url }) => result += `${url}\n`);
@@ -175,6 +253,15 @@ function beautifySetOutput (set) {
 
 // ==========================================================
 
+/**
+ * Put each link into its corresponding list
+ * Here you can also create lists on the fly.
+ * 
+ * @param {Array} arr - Filtered links 
+ * @param {Object} bigObj - The object from `config.json`
+ * @param {Object} storeTemp - The object that contains the links that will be added to a specific list without being filtered
+ *                           - @see {@link https://github.com/Andrei0872/medium-bookmarks-to-trello/pull/2}
+ */
 async function save(arr, bigObj, storeTemp) {
     const { trello } = bigObj; 
     const stdin = process.openStdin();
@@ -248,6 +335,14 @@ async function save(arr, bigObj, storeTemp) {
 
 // ==========================================================
 
+/**
+ * For each of the given links, this function will perform 2 requests
+ *  - Adding the link(card) to a certain list in Trello
+ *  - Removing this link from Medium's Bookmarks
+ * The function will also make sure that if one request fails, it will not proceed further.
+ * 
+ * @param {Array} requests - Each elements consists of a pair of 2 requests: 1 for Trello; 1 for Medium
+ */
 async function processRequests(requests) {
     let errorFound = false;
 
@@ -270,9 +365,15 @@ async function processRequests(requests) {
 }
 
 // ==========================================================
-/* 
-@if bigObj === false - add list to trello on the fly
-*/
+
+/**
+ * Add keyword/keywords to a specific fields
+ * Or you create a list
+ * 
+ * @param {Array} param0 
+ * @param {Object} bigObj 
+ * @param {Boolean} onlyCreateList 
+ */
 async function addFilterKey([nameToFind, newKey], bigObj, onlyCreateList = false) {
     const { trello } = bigObj;
 
@@ -281,13 +382,20 @@ async function addFilterKey([nameToFind, newKey], bigObj, onlyCreateList = false
     
     const mustCreateIndex = nameToFind.indexOf('!');
 
+    // Find the index of an existing list or set the name for the one that will be created
     mustCreateIndex === -1 &&
         (index_field = bigObj.filters
             .findIndex(({
                 name
             }) => name === nameToFind))
         || (newField = nameToFind.slice(mustCreateIndex + 1)) 
-    
+        
+    /**
+     * Convention: list name = field
+     * 
+     * If the intention was not to create a new list and the list name that the user 
+     * chose to add keywords to can't be found
+     */
     if (index_field === -1 && mustCreateIndex === -1) {
         console.log(`${nameToFind} cannot be found.`)
         const suggestions = bigObj.filters.filter(({ name }) => {
@@ -311,7 +419,7 @@ async function addFilterKey([nameToFind, newKey], bigObj, onlyCreateList = false
                 items: new Set()
             });
         // Add list to trello obj as well
-        console.log(`adding ${newField}`)
+        console.log(`adding ${newField} to Trello`)
         const { id, name, idBoard } = await addList(newField);
         trello[name] = location_info(id, idBoard);
     } else {
@@ -321,6 +429,12 @@ async function addFilterKey([nameToFind, newKey], bigObj, onlyCreateList = false
 
 // ==========================================================
 
+/**
+ * Convert an object and all its nested properties to JSON
+ * so it can be added to a JSON file
+ * 
+ * @param {Object} obj 
+ */
 function convertToJSON(obj) {
     const newKeyArr = JSON.stringify(obj.key.map(k => k.toString()))
     
@@ -332,11 +446,22 @@ function convertToJSON(obj) {
 
 // ==========================================================
 
+/**
+ * Show the list names that can be found in your Trello
+ * 
+ * @param {Array} list 
+ */
 function showList (list) {
     list.map(({ name }) => name).sort().forEach(log)
 }
 
 // ==========================================================
+
+/**
+ * The response we get after making a request to get the bookmarks consists of
+ * a big block of uglified html.
+ * It is our duty to use the power of regular expressions to get the link from all that text block.
+ */
 async function getUnfilteredLinks() {
 
     let res = await (await fetch('https://medium.com/me/list/bookmarks', {
@@ -357,27 +482,6 @@ async function getUnfilteredLinks() {
 
 // ==========================================================
 
-function fetchTrelloInfo () {
-    return new Promise (async (resolve, reject) => {
-        try {
-            const trelloInfo = await fetch(process.env.urlTrello, {
-                headers: trello_headers,
-                method: "GET"
-            });
-
-            if (!trelloInfo) {
-                throw trelloInfo;
-            }
-
-            resolve((await (trelloInfo.json())))
-        } catch (err) {
-            reject(err)
-        }
-    })
-}
-
-// ==========================================================
-
 function readFile(file) {
     return new Promise ((resolve, reject) => {
         fs.access(file, (err, _) => {
@@ -389,12 +493,25 @@ function readFile(file) {
 
 // ==========================================================
 
+/**
+ * Check if an object is empty
+ * 
+ * @param {Object} obj 
+ */
 function isEmptyObject (obj) {
     return JSON.stringify(obj) === JSON.stringify({});
 }
 
 // ==========================================================
 
+/**
+ * Clear the content of a file
+ * Particularly used with `temp.json`, which stores the links that will be added to a list
+ * without being filtered.
+ * So, after they are added, we want to clear the file.
+ * 
+ * @param {String} file 
+ */
 function clearFileContent (file) {
     fs.writeFile(file, '', (err, _) => {});
 } 
@@ -413,7 +530,6 @@ module.exports = {
     convertToJSON,
     getUnfilteredLinks,
     updateJSON,
-    fetchTrelloInfo,
     showList,
     readFile,
     isEmptyObject,

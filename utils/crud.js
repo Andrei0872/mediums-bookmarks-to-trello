@@ -1,5 +1,8 @@
 const fetch = require('node-fetch')
 
+/**
+ * Get the lists from a Trello board
+ */
 const getTrelloInfo = (() => {
     const URL = process.env.urlTrello;
     const headers = {
@@ -15,6 +18,9 @@ const getTrelloInfo = (() => {
 
 getTrelloInfo.idBoard = process.env.idBoard;
 
+/**
+ * Create a new list and add it to Trello
+ */
 const addList = (() => {
     const URL = process.env.urlTrelloLists;
     const headers = {
@@ -43,6 +49,9 @@ const addList = (() => {
     };
 })();
 
+/**
+ * Generate lists depending on what exports this file: {@link https://github.com/Andrei0872/medium-bookmarks-to-trello/blob/master/config/index.js}
+ */
 const generateLists = (() => {
     return async (infoArr, idBoard) => {
         return await Promise.all(
