@@ -26,6 +26,8 @@
     try {
         await readFile('./config.json');
     } catch {
+        // If `config.json` doesn't exist, it means that the Trello board is empty.
+        // So this will generate the lists, which will also be stored in `config.json`
 
         console.log('generating lists..');
         const filters = require('./config')
@@ -58,6 +60,10 @@
     }
 
     try {
+        /**
+         * This file stores the links that will be added to a list without being filtered
+         * More on this: {@link https://github.com/Andrei0872/medium-bookmarks-to-trello/pull/2}
+         */
         await readFile('./temp.json');
         storeTemp = fs.readFileSync('./temp.json', 'utf8') || {};
         storeTemp = JSON.parse(storeTemp);
@@ -65,13 +71,12 @@
 
     // ==========================================================
 
-    /* 
-    This could be used to get distinct links, but it's highly inefficient
-    const newLink = /(https:\/\/\S+\/[a-z-0-9\?=]+-+\d+-+)(?!.*\1)/gs;
-
-    Here's why: https://regex101.com/r/5tz37k/4
-    */
-
+    /**
+     * This could be used to get distinct links, but it 's highly inefficient
+     * const newLink = /(https:\/\/\S+\/[a-z-0-9\?=]+-+\d+-+)(?!.*\1)/gs;
+     * 
+     * Here's why: {@link https://regex101.com/r/5tz37k/4}
+     */
     const links = await getUnfilteredLinks();
     const filteredLinks = filterResults(links);
 
