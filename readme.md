@@ -5,8 +5,11 @@
 I firmly believe that our time should be spent on important things. <br>
 *The time you spent searching for an article could be time spent on reading that article.*
 
-## Demo
-Insert gif here
+## Quick Demo
+
+<div style="text-align: center;">
+    <img src="./screenshots/realDemo.gif">
+</div>
 
 ---
 
@@ -30,18 +33,26 @@ Insert gif here
 * the keywords for a field can also include regular expressions
 * <details>
     <summary>add keyword to a field</summary>
-    <div>
+    <p>
         Syntax: <code> $field_name $filter_key1 | $filter_key2</code>
         <br>
         Example: <code>react react hooks | \bstyled components\b</code>
-    </div>
+        <div>
+            <img src="./screenshots/add-key.png">
+        </div>
+    </p>
     </details> 
 * <details>
     <summary>create field and add keywords to it</summary>
     <div>
+        <p>
         Syntax: <code> create!$field_name $filter_key1 | $filter_key2</code>
         <br>
         Example: <code> create!posts development posts </code>
+        <div>
+            <img src="./screenshots/create-field-and-add-key.png">
+        </div>
+        </p>
     </div>
     </details> 
 * You can see where each card will be placed by having a look at **info.log** file after getting the message **All good? (y/n)**
@@ -53,6 +64,10 @@ Insert gif here
         Syntax: <code> temp!$list_name </code>
         <br>
         Example: <code> temp!react </code>
+        <br>
+        <div>
+            <img src="./screenshots/add-temp.png">
+        </div>
     </p>
   </details>
 
@@ -75,6 +90,11 @@ Insert gif here
         <li>Select the <i>idBoard</i> and paste it in the <i>.env</i> file</li>
         <li>Select the <i>token</i> and paste it in the <i>.env</i> file next to <i>tokenTrello</i></li>
         <li>Select the <i>cookie</i>(located in the Request Headers) and paste it in the <i>.env</i> file next to <i>cookieTrello</i></li>
+        <br>
+        <p><b>Companion Gif</b></p>
+        <div style="text-align: center;">
+            <img src="./screenshots/trello.gif">
+        </div>
     </ul>
 </details>
 
@@ -88,7 +108,12 @@ Insert gif here
         <li>in the <i>.env</i> file replace the <i>YOUR_BOARD_ID</i> with the short link</li>
         <li>You may now delete the list you have created earlier</li>
     </ul>
+    <p><b>Companion Gif</b></p>
+    <div style="text-align: center;">
+        <img src="./screenshots/trelloURL.gif">
+    </div>
 </details>
+
 
 ---
 
@@ -102,8 +127,8 @@ Getting the cookie & token
 * Copy the <i>cookie</i> located in the Request Headers and paste it in the <i>.env</i> file
 * Coy the <i>x-xsrf-token</i> located in the Request Headers and paste it in the <i>.env</i> file
 
-## Examples
-<!-- SS with medium bookmarks -->
-<!-- cli when running the main commnad -->
-<!-- trello afterwards -->
-<!-- all or nothing -->
+<p><b>Companion Gif</b></p>
+<div style="text-align: center;">
+    <img src="./screenshots/medium.gif">
+</div>
+
