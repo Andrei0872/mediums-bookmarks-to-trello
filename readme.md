@@ -132,3 +132,6 @@ Getting the cookie & token
     <img src="./screenshots/medium.gif">
 </div>
 
+## Contributing
+
+There are always improvements that could be made. All I ask is that you open an issue and we discuss your proposed changes before you create a pull request.
