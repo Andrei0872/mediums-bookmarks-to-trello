@@ -90,7 +90,7 @@
             const stdin = process.openStdin();
 
             process.stdout.write('\n\n\n');
-            process.stdout.write("type 'show_list' and have a look at info.log to see the available list names");
+            process.stdout.write("type 'show_list' and have a look at info.log to see the available list names\n");
             process.stdout.write('add filter key to an existing field: <field> <filter_key1> | <filter_key2>... \n')
             process.stdout.write('create field and add fields: create!<field_name> <filter_key1> | <filter_key2>\n');
 
