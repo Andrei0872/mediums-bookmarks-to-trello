@@ -162,7 +162,7 @@
         storeTemp[key] = new Set(storeTemp[key]);
     }
 
-    // console.log(filtered_again.slice(-4))
+    // console.log(bigObj.filters[0])
     // return;
     save(filtered_again, bigObj, storeTemp)
     log('\n==============================================\n');

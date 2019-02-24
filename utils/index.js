@@ -53,8 +53,25 @@ function parseJSON(obj) {
  * @param {Boolean} needsMap - used when the callee is bigObject 
  */
 function updateJSON(obj, file, needsMap = true) {
-    needsMap && (obj.filters = obj.filters.map(convertToJSON))
-    fs.writeFileSync(file, JSON.stringify(obj))
+    let finalObj = obj;
+
+    if (needsMap) {
+        const copy = JSON.parse(JSON.stringify(obj));
+        finalObj = copy;
+
+        copy.filters = copy.filters.map((item, index) => {
+            const key = [...obj.filters[index].key];
+
+            return {
+                ...item,
+                key
+            }
+        }).map(convertToJSON)
+        // console.log(copy.filters[0]);
+        // console.log(obj.filters[0]);
+    }
+
+    fs.writeFileSync(file, JSON.stringify(finalObj))
 }
 
 // ==========================================================
@@ -319,6 +336,8 @@ async function save(arr, bigObj, storeTemp) {
     }
 
     // Update after some changes have been made(adding keywords | creating new lists)
+    // console.log(bigObj)
+    // return;
     needsUpdate && updateJSON(bigObj, './config.json');
 
     rl.question('All good? (y/n)', text => {
