@@ -426,13 +426,10 @@ async function addFilterKey([nameToFind, newKey], bigObj, onlyCreateList = false
         const { id, name, idBoard } = await addList(newField);
         console.log(`list ${newField} added to Trello`)
         trello[name] = location_info(id, idBoard);
-        // filtered_again.push({ name: newField, key: newKey, items: new Set() });
         filtered_again[filtered_again.length -1].items.add(url);
-        console.log(filtered_again.slice(-4))
-
     } else {
         bigObj.filters[index_field].key.push(...newKey);
-        // filtered_again[index_field].key.push(...newKey);
+        filtered_again[index_field].items.add(url);
     }
 }
 
