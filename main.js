@@ -4,6 +4,7 @@
     const fs = require('fs')
     const log = require('./log');
     const { getTrelloInfo, generateLists } = require('./utils/crud.js');
+    const readline = require('readline');
     const {
         parseJSON,
         createRegex,
@@ -88,11 +89,14 @@
 
     if ([...yet_not_filtered].length && isEmptyObject(storeTemp)) {
 
-        log('Need to add filters!!!!!')
         const arrayFromSet = [...yet_not_filtered];
 
+        const rl = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout,
+        });
+
         arrayFromSet[Symbol.asyncIterator] = async function* () {
-            const stdin = process.openStdin();
 
             process.stdout.write('\n\n\n');
             process.stdout.write("type 'show_list' and have a look at info.log to see the available list names\n");
@@ -103,7 +107,7 @@
                 const res = await new Promise((resolve, reject) => {
                     console.log('current item:', val)
 
-                    stdin.addListener('data', (data) => {
+                    rl.question('', data => {
                         data = data.toString().replace(/\n/, '')
 
                         if (data === 'show_list') {
@@ -111,14 +115,13 @@
                         } else {
                             return resolve([data, val]);
                         }
-                        
-                    });
+                    })
                 })
                 yield res;
             }
         }
 
-        for await (const [item, val] of arrayFromSet) {
+        for await (const [item, url] of arrayFromSet) {
             if (item.startsWith('temp')) {
                 /**
                 * Add link to temp_field without specifying any keywords.
@@ -132,7 +135,7 @@
                 console.log('field', temp_field)
 
                 const existingUrls = storeTemp[temp_field] || []
-                existingUrls.push(val)
+                existingUrls.push(url)
 
                 storeTemp[temp_field] = existingUrls;
             } else {
@@ -142,16 +145,15 @@
                     .split('|')
                     .map(key => createRegex(key.replace(/(^\s+)|(\s+$)/g, '')))
 
-                addFilterKey([field, key], bigObj);
+                await addFilterKey([field, key], bigObj, false, [filtered_again, url]); 
             }
         }
 
+        rl.close();
         updateJSON(bigObj, './config.json');
         updateJSON(storeTemp, './temp.json', false);
-        log("updated!")
 
         process.stdout.write('\ndone!\n')
-        process.exit(0)
     }
     
     for (const key of Object.keys(storeTemp)) {

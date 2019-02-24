@@ -1,7 +1,8 @@
-const fetch = require('node-fetch')
+const fetch = require('node-fetch');
 const fs = require('fs');
 const path = require('path');
-const log = require('../log')
+const log = require('../log');
+const readline = require('readline');
 const { addList } = require('./crud');
 
 // Needed when you want to add a new card to Trello 
@@ -52,8 +53,23 @@ function parseJSON(obj) {
  * @param {Boolean} needsMap - used when the callee is bigObject 
  */
 function updateJSON(obj, file, needsMap = true) {
-    needsMap && (obj.filters = obj.filters.map(convertToJSON))
-    fs.writeFileSync(file, JSON.stringify(obj))
+    let finalObj = obj;
+
+    if (needsMap) {
+        const copy = JSON.parse(JSON.stringify(obj));
+        finalObj = copy;
+
+        copy.filters = copy.filters.map((item, index) => {
+            const key = [...obj.filters[index].key];
+
+            return {
+                ...item,
+                key
+            }
+        }).map(convertToJSON)
+    }
+
+    fs.writeFileSync(file, JSON.stringify(finalObj))
 }
 
 // ==========================================================
@@ -264,8 +280,11 @@ function beautifySetOutput (set) {
  */
 async function save(arr, bigObj, storeTemp) {
     const { trello } = bigObj; 
-    const stdin = process.openStdin();
     let needsUpdate = false;
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout,
+    });
 
     const listsAndTheirCards = arr.reduce((memo, curr) => {
         if (curr.items.size) {
@@ -284,21 +303,19 @@ async function save(arr, bigObj, storeTemp) {
 
             console.log(`the list ${prop} is missing in Trello. This list consists of:\n ${beautifySetOutput(listsAndTheirCards[prop])}\n`)
             log('');
-            process.stdout.write(`do you want to create the '${prop}' list now ? (y/n)`)
 
             // Wait for the user to accept/decline
             await new Promise((resolve, reject) => {
-                stdin.addListener('data', async data => {
+                rl.question(`do you want to create the '${prop}' list now ? (y/n)`, async data => {
                     const answer = data.toString().toLowerCase().trim()
-    
+
                     if (answer === 'y') {
                         await addFilterKey([`create!${prop}`, []], bigObj, true);
+                        resolve();
                     } else {
                         console.log('you must create the list before proceeding!')
                         process.exit(1);
                     }
-
-                    resolve();
                 })
             });
         }
@@ -317,9 +334,7 @@ async function save(arr, bigObj, storeTemp) {
     // Update after some changes have been made(adding keywords | creating new lists)
     needsUpdate && updateJSON(bigObj, './config.json');
 
-    process.stdout.write('All good? (y/n)');
-
-    stdin.addListener('data', text => {
+    rl.question('All good? (y/n)', text => {
         const resp = text.toString().trim()
 
         if (resp === 'y' || resp === 'Y') {
@@ -329,8 +344,9 @@ async function save(arr, bigObj, storeTemp) {
             console.log('Ok, make your changes. I\'ll wait here!')
         }
 
-        stdin.pause();
+        rl.close();
     })
+
 }
 
 // ==========================================================
@@ -374,7 +390,7 @@ async function processRequests(requests) {
  * @param {Object} bigObj 
  * @param {Boolean} onlyCreateList 
  */
-async function addFilterKey([nameToFind, newKey], bigObj, onlyCreateList = false) {
+async function addFilterKey([nameToFind, newKey], bigObj, onlyCreateList = false, [filtered_again, url] = []) {
     const { trello } = bigObj;
 
     let index_field = -1,
@@ -406,7 +422,7 @@ async function addFilterKey([nameToFind, newKey], bigObj, onlyCreateList = false
         })
         .map(filter => filter.name)
 
-        console.log(`Maybe you meant: ${suggestions}`)
+        suggestions.length && console.log(`Maybe you meant: ${suggestions}`)
         process.exit(1)
     }
 
@@ -418,12 +434,15 @@ async function addFilterKey([nameToFind, newKey], bigObj, onlyCreateList = false
                 key: newKey,
                 items: new Set()
             });
-        // Add list to trello obj as well
-        console.log(`adding ${newField} to Trello`)
+
+        // Add list to Trello obj as well
         const { id, name, idBoard } = await addList(newField);
+        console.log(`list ${newField} added to Trello`)
         trello[name] = location_info(id, idBoard);
+        !onlyCreateList && filtered_again[filtered_again.length - 1].items.add(url);
     } else {
-        bigObj.filters[index_field].key.push(...newKey)
+        bigObj.filters[index_field].key.push(...newKey);
+        !onlyCreateList && filtered_again[index_field].items.add(url);
     }
 }
 
