@@ -67,8 +67,6 @@ function updateJSON(obj, file, needsMap = true) {
                 key
             }
         }).map(convertToJSON)
-        // console.log(copy.filters[0]);
-        // console.log(obj.filters[0]);
     }
 
     fs.writeFileSync(file, JSON.stringify(finalObj))
@@ -288,8 +286,6 @@ async function save(arr, bigObj, storeTemp) {
         output: process.stdout,
     });
 
-    // console.log(arr)
-    // return;
     const listsAndTheirCards = arr.reduce((memo, curr) => {
         if (curr.items.size) {
             const existingItems = memo[curr.name] || new Set();
@@ -336,8 +332,6 @@ async function save(arr, bigObj, storeTemp) {
     }
 
     // Update after some changes have been made(adding keywords | creating new lists)
-    // console.log(bigObj)
-    // return;
     needsUpdate && updateJSON(bigObj, './config.json');
 
     rl.question('All good? (y/n)', text => {

@@ -121,7 +121,7 @@
             }
         }
 
-        for await (const [item, val] of arrayFromSet) {
+        for await (const [item, url] of arrayFromSet) {
             if (item.startsWith('temp')) {
                 /**
                 * Add link to temp_field without specifying any keywords.
@@ -135,7 +135,7 @@
                 console.log('field', temp_field)
 
                 const existingUrls = storeTemp[temp_field] || []
-                existingUrls.push(val)
+                existingUrls.push(url)
 
                 storeTemp[temp_field] = existingUrls;
             } else {
@@ -145,8 +145,7 @@
                     .split('|')
                     .map(key => createRegex(key.replace(/(^\s+)|(\s+$)/g, '')))
 
-                // FIXME: val = url!
-                await addFilterKey([field, key], bigObj, false, [filtered_again, val]); 
+                await addFilterKey([field, key], bigObj, false, [filtered_again, url]); 
             }
         }
 
@@ -155,15 +154,12 @@
         updateJSON(storeTemp, './temp.json', false);
 
         process.stdout.write('\ndone!\n')
-        // process.exit(0);
     }
     
     for (const key of Object.keys(storeTemp)) {
         storeTemp[key] = new Set(storeTemp[key]);
     }
 
-    // console.log(bigObj.filters[0])
-    // return;
     save(filtered_again, bigObj, storeTemp)
     log('\n==============================================\n');
 })()
