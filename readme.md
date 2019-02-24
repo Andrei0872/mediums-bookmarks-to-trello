@@ -23,6 +23,8 @@ I firmly believe that our time should be spent on important things. <br>
 
 * [Setting up Medium](#setting-up-medium)
 
+You might have to update the **.env** file from time to time, because cookies have limited lifetime.
+
 ---
 
 ## Features
