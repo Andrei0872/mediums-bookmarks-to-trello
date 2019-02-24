@@ -30,7 +30,16 @@ I firmly believe that our time should be spent on important things. <br>
 *conventions*: field = list name; keyword = filter key
 
 * fetch saved posts from Medium and transfer them to Trello and also remove them from bookmark list
-* the keywords for a field can also include regular expressions
+* <details>
+    <summary>
+        the keywords for a field can also include regular expressions
+    </summary>
+    <p>
+        <div>
+            <img src="./screenshots/add-regex-key.gif">
+        </div>
+    </p>
+  </details>
 * <details>
     <summary>add keyword to a field</summary>
     <p>
