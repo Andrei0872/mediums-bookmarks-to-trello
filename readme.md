@@ -38,7 +38,7 @@ I firmly believe that our time should be spent on important things. <br>
         <br>
         Example: <code>react react hooks | \bstyled components\b</code>
         <div>
-            <img src="./screenshots/add-key.png">
+            <img src="./screenshots/add-key.gif">
         </div>
     </p>
     </details> 
@@ -50,7 +50,7 @@ I firmly believe that our time should be spent on important things. <br>
         <br>
         Example: <code> create!posts development posts </code>
         <div>
-            <img src="./screenshots/create-field-and-add-key.png">
+            <img src="./screenshots/create-and-add-key.gif">
         </div>
         </p>
     </div>
@@ -66,7 +66,7 @@ I firmly believe that our time should be spent on important things. <br>
         Example: <code> temp!react </code>
         <br>
         <div>
-            <img src="./screenshots/add-temp.png">
+            <img src="./screenshots/add-temp.gif">
         </div>
     </p>
   </details>
