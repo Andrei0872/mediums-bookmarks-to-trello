@@ -377,7 +377,7 @@ async function processRequests(requests) {
  * @param {Object} bigObj 
  * @param {Boolean} onlyCreateList 
  */
-async function addFilterKey([nameToFind, newKey], bigObj, onlyCreateList = false, [filtered_again, url]) {
+async function addFilterKey([nameToFind, newKey], bigObj, onlyCreateList = false, [filtered_again, url] = []) {
     const { trello } = bigObj;
 
     let index_field = -1,
@@ -426,10 +426,10 @@ async function addFilterKey([nameToFind, newKey], bigObj, onlyCreateList = false
         const { id, name, idBoard } = await addList(newField);
         console.log(`list ${newField} added to Trello`)
         trello[name] = location_info(id, idBoard);
-        filtered_again[filtered_again.length -1].items.add(url);
+        !onlyCreateList && filtered_again[filtered_again.length - 1].items.add(url);
     } else {
         bigObj.filters[index_field].key.push(...newKey);
-        filtered_again[index_field].items.add(url);
+        !onlyCreateList && filtered_again[index_field].items.add(url);
     }
 }
 
