@@ -271,6 +271,8 @@ async function save(arr, bigObj, storeTemp) {
         output: process.stdout,
     });
 
+    // console.log(arr)
+    // return;
     const listsAndTheirCards = arr.reduce((memo, curr) => {
         if (curr.items.size) {
             const existingItems = memo[curr.name] || new Set();
@@ -375,7 +377,7 @@ async function processRequests(requests) {
  * @param {Object} bigObj 
  * @param {Boolean} onlyCreateList 
  */
-async function addFilterKey([nameToFind, newKey], bigObj, onlyCreateList = false) {
+async function addFilterKey([nameToFind, newKey], bigObj, onlyCreateList = false, [filtered_again, url]) {
     const { trello } = bigObj;
 
     let index_field = -1,
@@ -424,8 +426,13 @@ async function addFilterKey([nameToFind, newKey], bigObj, onlyCreateList = false
         const { id, name, idBoard } = await addList(newField);
         console.log(`list ${newField} added to Trello`)
         trello[name] = location_info(id, idBoard);
+        // filtered_again.push({ name: newField, key: newKey, items: new Set() });
+        filtered_again[filtered_again.length -1].items.add(url);
+        console.log(filtered_again.slice(-4))
+
     } else {
-        bigObj.filters[index_field].key.push(...newKey)
+        bigObj.filters[index_field].key.push(...newKey);
+        // filtered_again[index_field].key.push(...newKey);
     }
 }
 

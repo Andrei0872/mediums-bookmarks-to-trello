@@ -89,7 +89,6 @@
 
     if ([...yet_not_filtered].length && isEmptyObject(storeTemp)) {
 
-        log('Need to add filters!!!!!')
         const arrayFromSet = [...yet_not_filtered];
 
         const rl = readline.createInterface({
@@ -146,23 +145,25 @@
                     .split('|')
                     .map(key => createRegex(key.replace(/(^\s+)|(\s+$)/g, '')))
 
-                await addFilterKey([field, key], bigObj);
+                // FIXME: val = url!
+                await addFilterKey([field, key], bigObj, false, [filtered_again, val]); 
             }
         }
 
         rl.close();
         updateJSON(bigObj, './config.json');
         updateJSON(storeTemp, './temp.json', false);
-        log("updated!")
 
         process.stdout.write('\ndone!\n')
-        process.exit(0);
+        // process.exit(0);
     }
     
     for (const key of Object.keys(storeTemp)) {
         storeTemp[key] = new Set(storeTemp[key]);
     }
 
+    // console.log(filtered_again.slice(-4))
+    // return;
     save(filtered_again, bigObj, storeTemp)
     log('\n==============================================\n');
 })()
